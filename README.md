@@ -38,7 +38,7 @@ const setCounter = (value) => {
   render();
 };
 
-const isEven = () => (counter & 1) == 0;
+const isEven = () => (counter & 1) === 0;
 const parity = () => isEven() ? "even" : "odd";
 const render = () => element.innerText = parity();
 
@@ -75,7 +75,7 @@ To understand Signals, let's take a look at the above example, re-imagined with 
 
 ```js
 const counter = new Signal.State(0);
-const isEven = new Signal.Computed(() => (counter.get() & 1) == 0);
+const isEven = new Signal.Computed(() => (counter.get() & 1) === 0);
 const parity = new Signal.Computed(() => isEven.get() ? "even" : "odd");
 
 // A library or framework defines effects based on other Signal primitives
@@ -355,12 +355,14 @@ The `Watcher` interface defined above gives the basis for implementing typical J
 // NOTE: This scheduling logic is too basic to be useful. Do not copy/paste.
 let pending = false;
 
-let w = new Signal.subtle.Watcher(() => {
+const w = new Signal.subtle.Watcher(() => {
     if (!pending) {
         pending = true;
         queueMicrotask(() => {
             pending = false;
-            for (let s of w.getPending()) s.get();
+            for (let s of w.getPending()) {
+                s.get();
+            }
             w.watch();
         });
     }
@@ -370,7 +372,7 @@ let w = new Signal.subtle.Watcher(() => {
 // itself on the microtask queue whenever one of its dependencies might change
 export function effect(cb) {
     let destructor;
-    let c = new Signal.Computed(() => { destructor?.(); destructor = cb(); });
+    const c = new Signal.Computed(() => { destructor?.(); destructor = cb(); });
     w.watch(c);
     c.get();
     return () => { destructor?.(); w.unwatch(c) };
