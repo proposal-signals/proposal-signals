@@ -284,6 +284,10 @@ namespace Signal {
             // Returns the set of sources in the Watcher's set which are still dirty, or is a computed signal
             // with a source which is dirty or pending and hasn't yet been re-evaluated
             getPending(): Signal[];
+
+            // Unwatch all signals in this watcher
+            // Equivalent to this.unwatch(...Signal.subtle.introspectSinks(this))
+            [Symbol.dispose](): void;
         }
 
         // Hooks to observe being watched or no longer watched
